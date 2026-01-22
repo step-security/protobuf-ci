@@ -1,0 +1,67 @@
+# Copyright 2023 Google LLC
+# Copyright 2026 StepSecurity
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 'Github Checkout'
+description: 'Check out a Github repository'
+inputs:
+  ref:
+    required: true
+    description: "The branch, tag or SHA to checkout"
+  submodules:
+    required: false
+    description: "Whether or not to checkout submodules"
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Subscription check
+      run: |
+        # validate subscription status
+        API_URL="https://agent.api.stepsecurity.io/v1/github/$GITHUB_REPOSITORY/actions/subscription"
+
+        # Set a timeout for the curl command (3 seconds)
+        RESPONSE=$(curl --max-time 3 -s -w "%{http_code}" "$API_URL" -o /dev/null) || true
+        CURL_EXIT_CODE=$?
+
+        # Decide based on curl exit code and HTTP status
+        if [ $CURL_EXIT_CODE -ne 0 ]; then
+          echo "Timeout or API not reachable. Continuing to next step."
+        elif [ "$RESPONSE" = "200" ]; then
+          :
+        elif [ "$RESPONSE" = "403" ]; then
+          echo "Subscription is not valid. Reach out to support@stepsecurity.io"
+          exit 1
+        else
+          echo "Timeout or API not reachable. Continuing to next step."
+        fi
+      shell: bash
+
+    - name: Checkout pending changes
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        ref: ${{ inputs.ref }}
+
+    - name: Checkout submodules
+      if: ${{ inputs.submodules }}
+      uses: step-security/retry@e1d59ce1f574b32f0915e3a8df055cfe9f99be5d # v3.0.4
+      with:
+        timeout_seconds: 30
+        retry_wait_seconds: 30
+        max_attempts: 5
+        shell: bash
+        command: |
+          git submodule deinit --all -f
+          git submodule sync
+          git submodule update --force --init ${{ inputs.submodules == 'recursive' && '--recursive' || '' }}
