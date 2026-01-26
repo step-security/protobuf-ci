@@ -93,7 +93,7 @@ runs:
 
     - name: Install sccache on non-Linux machines
       if: ${{ runner.os != 'Linux' }}
-      uses: step-security/sccache-action@release
+      uses: step-security/sccache-action@main
       with:
         version: ${{ inputs.version }}
 
