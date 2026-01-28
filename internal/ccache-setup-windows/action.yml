@@ -33,7 +33,7 @@ runs:
   using: 'composite'
   steps:
     - name: Setup MSVC
-      uses: step-security/msvc-dev-cmd@main
+      uses: step-security/msvc-dev-cmd@b6785bfa185fd13a6d9a144013ea4c0220473d0f # v1.13.0
       with:
         arch: ${{ inputs.arch }}
         vsversion: ${{ inputs.vsversion }}

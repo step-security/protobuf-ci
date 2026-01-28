@@ -51,7 +51,7 @@ runs:
     - name: Setup QEMU for possible emulation
       # Most tests don't require this, so just continue if there's a network issue.
       continue-on-error: true
-      uses: step-security/setup-qemu-action@main
+      uses: step-security/setup-qemu-action@8c4aef027ab2df56e08f597afe6dd8cd31cb84f5  # v3.7.0
       with:
         # This is mirrored from tonistiigi/binfmt:qemu-v9.2.0 for better reliability.
         image: us-docker.pkg.dev/protobuf-build/containers/test/binfmt@sha256:10d6fc4cc07629be6d9960ae427535ea2e6ceec57206cafc5471e3476141a46f
