@@ -115,13 +115,13 @@ runs:
 
     - name: Install sccache on non-Linux machines
       if: ${{ runner.os != 'Linux' }}
-      uses: step-security/sccache-action@cd685c57bf16e79e8e5c42ba934c3666d2b1819e # v0.0.9
+      uses: step-security/sccache-action@7833b7183adae0b5ce10d79a9ab171c03423d37e #v0.0.10
       with:
         version: ${{ inputs.version }}
 
     - name: Warm-up sccache server (non-docker)
       if: ${{ runner.os != 'Linux' }}
-      uses: step-security/retry@e1d59ce1f574b32f0915e3a8df055cfe9f99be5d # v3.0.4
+      uses: step-security/retry@38808b4332b98bb36ca031abff0c100231608288 #v4.0.0
       with:
         timeout_minutes: 5
         retry_wait_seconds: 60
